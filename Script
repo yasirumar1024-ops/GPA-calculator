@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>University of Swat - GPA Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-deep: #0a0e17;
+            --bg-card: rgba(15, 23, 42, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.4);
+            --border-glass: rgba(148, 163, 184, 0.08);
+            --border-active: rgba(56, 189, 248, 0.3);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-cyan: #22d3ee;
+            --accent-purple: #a78bfa;
+            --accent-emerald: #34d399;
+            --accent-rose: #fb7185;
+            --accent-amber: #fbbf24;
+            --gradient-hero: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 50%, #ec4899 100%);
+            --gradient-cyan: linear-gradient(135deg, #06b6d4, #22d3ee);
+            --gradient-emerald: linear-gradient(135deg, #10b981, #34d399);
+            --gradient-rose: linear-gradient(135deg, #e11d48, #fb7185);
+            --shadow-glow: 0 0 40px rgba(14, 165, 233, 0.15);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --radius-sm: 12px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: orbFloat 20s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(14,165,233,0.4), transparent 70%);
+            top: -10%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139,92,246,0.35), transparent 70%);
+            top: 40%;
+            right: -15%;
+            animation-delay: -7s;
+        }
+
+        .orb-3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(236,72,153,0.3), transparent 70%);
+            bottom: -10%;
+            left: 30%;
+            animation-delay: -14s;
+        }
+
+        .grid-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background-image: 
+                linear-gradient(rgba(148,163,184,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148,163,184,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -30px) scale(1.05); }
+            50% { transform: translate(-20px, 20px) scale(0.95); }
+            75% { transform: translate(20px, 10px) scale(1.02); }
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 2;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 24px 16px 60px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            animation: fadeInDown 0.8s var(--transition-smooth) both;
+        }
+
+        .logo-ring {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 20px;
+            position: relative;
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+
+        .logo-ring::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: var(--gradient-hero);
+            opacity: 0.5;
+            filter: blur(12px);
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+
+        .logo-inner {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .logo-inner i {
+            font-size: 28px;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        @keyframes logoGlow {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+
+        .header h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.6rem, 5vw, 2.2rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+
+        .header h1 span {
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .header-accent {
+            width: 48px;
+            height: 3px;
+            background: var(--gradient-hero);
+            border-radius: 2px;
+            margin: 16px auto 0;
+            position: relative;
+        }
+
+        .header-accent::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            background: var(--gradient-hero);
+            border-radius: 4px;
+            filter: blur(8px);
+            opacity: 0.5;
+        }
+
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-card);
+            animation: fadeInUp 0.7s var(--transition-smooth) both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+
+        .glass-card:nth-child(2) { animation-delay: 0.1s; }
+        .glass-card:nth-child(3) { animation-delay: 0.2s; }
+        .glass-card:nth-child(4) { animation-delay: 0.3s; }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: var(--accent-cyan);
+        }
+
+        .card-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .input-field {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .input-field label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrap {
+            position: relative;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .input-wrap:focus-within {
+            border-color: var(--border-active);
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1), 0 0 20px rgba(34, 211, 238, 0.05);
+        }
+
+        .input-wrap i {
+            padding-left: 14px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            transition: color var(--transition-fast);
+        }
+
+        .input-wrap:focus-within i {
+            color: var(--accent-cyan);
+        }
+
+        .input-wrap input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 14px 14px 14px 10px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            outline: none;
+            width: 100%;
+            -webkit-appearance: none;
+        }
+
+        .input-wrap input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .custom-select {
+            position: relative;
+            user-select: none;
+        }
+
+        .select-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .select-trigger:hover {
+            border-color: rgba(148, 163, 184, 0.2);
+        }
+
+        .select-trigger.active {
+            border-color: var(--border-active);
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1);
+        }
+
+        .select-trigger .placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .select-trigger i {
+            color: var(--text-muted);
+            transition: transform var(--transition-fast);
+            font-size: 0.8rem;
+        }
+
+        .select-trigger.active i {
+            transform: rotate(180deg);
+            color: var(--accent-cyan);
+        }
+
+        .select-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-sm);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px) scale(0.96);
+            transition: all var(--transition-fast);
+            max-height: 240px;
+            overflow-y: auto;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .select-dropdown.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .select-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.05);
+        }
+
+        .select-option:last-child {
+            border-bottom: none;
+        }
+
+        .select-option:hover {
+            background: rgba(34, 211, 238, 0.08);
+            color: var(--accent-cyan);
+        }
+
+        .select-option.selected {
+            background: rgba(34, 211, 238, 0.12);
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .select-option .check {
+            opacity: 0;
+            font-size: 0.8rem;
+        }
+
+        .select-option.selected .check {
+            opacity: 1;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 14px 22px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s;
+        }
+
+        .btn:hover::after {
+            transform: translateX(100%);
+        }
+
+        .btn-primary {
+            background: var(--gradient-cyan);
+            color: #0a0e17;
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(6, 182, 212, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--bg-glass);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-glass);
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(148, 163, 184, 0.25);
+            color: var(--text-primary);
+            background: rgba(30, 41, 59, 0.6);
+        }
+
+        .btn-success {
+            background: var(--gradient-emerald);
+            color: #0a0e17;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid transparent;
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            min-width: auto;
+            flex: none;
+        }
+
+        .btn-ghost:hover {
+            color: var(--accent-rose);
+            background: rgba(251, 113, 133, 0.08);
+            border-color: rgba(251, 113, 133, 0.15);
+        }
+
+        .subject-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .subject-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            position: relative;
+            transition: all var(--transition-fast);
+            animation: slideIn 0.4s var(--transition-bounce) both;
+        }
+
+        .subject-card:hover {
+            border-color: rgba(148, 163, 184, 0.15);
+            transform: translateX(4px);
+        }
+
+        .subject-card.removing {
+            animation: slideOut 0.3s var(--transition-smooth) forwards;
+        }
+
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .subject-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .subject-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: var(--gradient-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #0a0e17;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .subject-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .subject-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .subject-inputs .input-field {
+            margin-bottom: 0;
+        }
+
+        .subject-inputs .input-field label {
+            font-size: 0.7rem;
+        }
+
+        .subject-inputs .input-wrap input {
+            padding: 12px 12px 12px 10px;
+            font-size: 0.95rem;
+        }
+
+        .subject-gpa-chip {
+            margin-top: 14px;
+            padding: 10px 14px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 10px;
+            border: 1px solid var(--border-glass);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .subject-gpa-chip span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .subject-gpa-chip strong {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            color: var(--accent-cyan);
+        }
+
+        .result-wrapper {
+            display: none;
+            animation: fadeInUp 0.6s var(--transition-smooth) both;
+        }
+
+        .result-wrapper.visible {
+            display: block;
+        }
+
+        .result-hero {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-xl);
+            padding: 40px 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .result-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(14,165,233,0.03), transparent, rgba(139,92,246,0.03), transparent);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            to { transform: rotate(360deg); }
+        }
+
+        .result-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .result-gpa {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(3.5rem, 12vw, 5rem);
+            font-weight: 700;
+            line-height: 1;
+            margin: 8px 0;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .result-gpa::after {
+            content: attr(data-gpa);
+            position: absolute;
+            inset: 0;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: blur(20px);
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .result-grade {
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 12px 0;
+            border: 1px solid;
+        }
+
+        .result-message {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .result-stats {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 28px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 12px 20px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-sm);
+            min-width: 100px;
+        }
+
+        .stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        .grade-table-wrap {
+            overflow-x: auto;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-glass);
+        }
+
+        .grade-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .grade-table th {
+            background: var(--bg-glass);
+            color: var(--text-secondary);
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .grade-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-glass);
+            color: var(--text-secondary);
+        }
+
+        .grade-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .grade-table tr:hover td {
+            background: rgba(34, 211, 238, 0.03);
+            color: var(--text-primary);
+        }
+
+        .grade-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .tag-a { background: rgba(34, 211, 238, 0.15); color: var(--accent-cyan); }
+        .tag-b { background: rgba(167, 139, 250, 0.15); color: var(--accent-purple); }
+        .tag-c { background: rgba(52, 211, 153, 0.15); color: var(--accent-emerald); }
+        .tag-d { background: rgba(251, 191, 36, 0.15); color: var(--accent-amber); }
+        .tag-f { background: rgba(251, 113, 133, 0.15); color: var(--accent-rose); }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .footer strong {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--border-glass);
+            border-radius: 50px;
+            padding: 14px 28px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: all var(--transition-bounce);
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .toast i {
+            color: var(--accent-cyan);
+        }
+
+        .toast.error i { color: var(--accent-rose); }
+        .toast.success i { color: var(--accent-emerald); }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px) scale(0.98); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
+        }
+
+        @keyframes slideOut {
+            to { opacity: 0; transform: translateX(30px) scale(0.95); height: 0; padding: 0; margin: 0; border: none; overflow: hidden; }
+        }
+
+        @media (max-width: 640px) {
+            .app-container {
+                padding: 16px 12px 40px;
+            }
+            .glass-card {
+                padding: 18px;
+                border-radius: var(--radius-md);
+            }
+            .subject-inputs {
+                grid-template-columns: 1fr;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
+            .result-stats {
+                gap: 10px;
+            }
+            .stat-item {
+                flex: 1;
+                min-width: 80px;
+                padding: 10px 12px;
+            }
+            .stat-value {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+            .result-gpa {
+                font-size: 3rem;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.2);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.3);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="bg-canvas">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <div class="app-container">
+        <header class="header">
+            <div class="logo-ring">
+                <div class="logo-inner">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+            </div>
+            <h1>University of <span>Swat</span></h1>
+            <p>GPA Calculator</p>
+            <div class="header-accent"></div>
+        </header>
+
+        <div class="glass-card">
+            <div class="card-header">
+                <div class="card-icon"><i class="fas fa-sliders-h"></i></div>
+                <div class="card-title">Quick Setup</div>
+            </div>
+            <div class="input-field">
+                <label>Number of Subjects</label>
+                <div class="input-wrap">
+                    <i class="fas fa-hashtag"></i>
+                    <input type="number" id="subjectCount" min="1" max="20" placeholder="Enter number (1-20)" 
+                           onkeypress="if(event.key==='Enter') App.generateSubjects()">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="App.generateSubjects()">
+                    <i class="fas fa-bolt"></i> Generate
+                </button>
+                <button class="btn btn-secondary" onclick="App.resetAll()">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <div class="glass-card" id="subjectsCard" style="display:none;">
+            <div class="card-header">
+                <div class="card-icon"><i class="fas fa-layer-group"></i></div>
+                <div class="card-title">Subject Details</div>
+            </div>
+            <div class="subject-list" id="subjectList"></div>
+            <div class="btn-group" style="margin-top: 20px;">
+                <button class="btn btn-success" onclick="App.addSubject()">
+                    <i class="fas fa-plus"></i> Add Subject
+                </button>
+                <button class="btn btn-primary" onclick="App.calculateGPA()">
+                    <i class="fas fa-calculator"></i> Calculate GPA
+                </button>
+            </div>
+        </div>
+
+        <div class="result-wrapper" id="resultWrapper">
+            <div class="result-hero">
+                <div class="result-content">
+                    <div class="result-label">Your Final GPA</div>
+                    <div class="result-gpa" id="finalGPA" data-gpa="0.00">0.00</div>
+                    <div class="result-grade" id="resultGrade">-</div>
+                    <div class="result-message" id="resultMessage">Enter your subjects to calculate</div>
+                    <div class="result-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalCredits">0</div>
+                            <div class="stat-label">Credit Hours</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalPoints">0</div>
+                            <div class="stat-label">Quality Points</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="subjectCountDisplay">0</div>
+                            <div class="stat-label">Subjects</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <div class="card-header">
+                <div class="card-icon"><i class="fas fa-table"></i></div>
+                <div class="card-title">Grade Scale</div>
+            </div>
+            <div class="grade-table-wrap">
+                <table class="grade-table">
+                    <thead>
+                        <tr><th>Marks</th><th>GPA</th><th>Grade</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>85 - 100</td><td>4.0</td><td><span class="grade-tag tag-a">A</span></td></tr>
+                        <tr><td>82 - 84</td><td>3.7 - 3.9</td><td><span class="grade-tag tag-a">A-</span></td></tr>
+                        <tr><td>80 - 81</td><td>3.5 - 3.6</td><td><span class="grade-tag tag-b">B+</span></td></tr>
+                        <tr><td>74 - 79</td><td>3.2 - 3.4</td><td><span class="grade-tag tag-b">B</span></td></tr>
+                        <tr><td>70 - 73</td><td>2.8 - 3.1</td><td><span class="grade-tag tag-c">B- / C+</span></td></tr>
+                        <tr><td>64 - 69</td><td>2.3 - 2.7</td><td><span class="grade-tag tag-c">C / C-</span></td></tr>
+                        <tr><td>60 - 63</td><td>2.0 - 2.2</td><td><span class="grade-tag tag-d">D / D+</span></td></tr>
+                        <tr><td>50 - 59</td><td>1.0 - 1.9</td><td><span class="grade-tag tag-d">D-</span></td></tr>
+                        <tr><td>Below 50</td><td>0.0</td><td><span class="grade-tag tag-f">F</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Made for <strong>University of Swat</strong> students</p>
+            <p style="margin-top:4px; opacity:0.6;">Based on official grading policy</p>
+        </footer>
+    </div>
+
+    <div class="toast-container">
+        <div class="toast" id="toast">
+            <i class="fas fa-info-circle"></i>
+            <span id="toastMessage">Message</span>
+        </div>
+    </div>
+
+    <script>
+        const App = {
+            subjects: [],
+            creditOptions: [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6],
+
+            init() {
+                this.bindGlobalEvents();
+            },
+
+            bindGlobalEvents() {
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.custom-select')) {
+                        document.querySelectorAll('.select-dropdown.open').forEach(d => {
+                            d.classList.remove('open');
+                            d.previousElementSibling?.classList.remove('active');
+                        });
+                    }
+                });
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        document.querySelectorAll('.select-dropdown.open').forEach(d => {
+                            d.classList.remove('open');
+                            d.previousElementSibling?.classList.remove('active');
+                        });
+                    }
+                });
+            },
+
+            getGPA(marks) {
+                if (marks >= 85) return 4.0;
+                if (marks == 84) return 3.9;
+                if (marks == 83) return 3.8;
+                if (marks == 82) return 3.7;
+                if (marks == 81) return 3.6;
+                if (marks == 80) return 3.5;
+                if (marks == 79) return 3.4;
+                if (marks == 78) return 3.4;
+                if (marks == 77) return 3.3;
+                if (marks == 76) return 3.3;
+                if (marks == 75) return 3.2;
+                if (marks == 74) return 3.2;
+                if (marks == 73) return 3.1;
+                if (marks == 72) return 3.0;
+                if (marks == 71) return 2.9;
+                if (marks == 70) return 2.8;
+                if (marks == 69) return 2.7;
+                if (marks == 68) return 2.6;
+                if (marks == 67) return 2.5;
+                if (marks == 66) return 2.5;
+                if (marks == 65) return 2.4;
+                if (marks == 64) return 2.4;
+                if (marks == 63) return 2.3;
+                if (marks == 62) return 2.2;
+                if (marks == 61) return 2.1;
+                if (marks == 60) return 2.0;
+                if (marks == 59) return 1.9;
+                if (marks == 58) return 1.8;
+                if (marks == 57) return 1.7;
+                if (marks == 56) return 1.6;
+                if (marks == 55) return 1.5;
+                if (marks == 54) return 1.4;
+                if (marks == 53) return 1.3;
+                if (marks == 52) return 1.2;
+                if (marks == 51) return 1.1;
+                if (marks == 50) return 1.0;
+                return 0.0;
+            },
+
+            getGradeLetter(gpa) {
+                if (gpa >= 3.7) return 'A';
+                if (gpa >= 3.3) return 'B+';
+                if (gpa >= 3.0) return 'B';
+                if (gpa >= 2.7) return 'B-';
+                if (gpa >= 2.3) return 'C+';
+                if (gpa >= 2.0) return 'C';
+                if (gpa >= 1.0) return 'D';
+                return 'F';
+            },
+
+            getGradeStyle(gpa) {
+                if (gpa >= 3.5) return { cls: 'tag-a', color: '#22d3ee' };
+                if (gpa >= 3.0) return { cls: 'tag-b', color: '#a78bfa' };
+                if (gpa >= 2.0) return { cls: 'tag-c', color: '#34d399' };
+                if (gpa >= 1.0) return { cls: 'tag-d', color: '#fbbf24' };
+                return { cls: 'tag-f', color: '#fb7185' };
+            },
+
+            getPerformanceMessage(gpa) {
+                if (gpa >= 3.7) return "Outstanding performance! Keep shining!";
+                if (gpa >= 3.3) return "Excellent work! You are on fire!";
+                if (gpa >= 3.0) return "Great job! Solid results!";
+                if (gpa >= 2.5) return "Good effort! Room to grow!";
+                if (gpa >= 2.0) return "Passing. Push harder next time!";
+                if (gpa > 0) return "Needs improvement. Do not give up!";
+                return "Failed. Consult your advisor!";
+            },
+
+            showToast(message, type) {
+                type = type || 'info';
+                const toast = document.getElementById('toast');
+                const msg = document.getElementById('toastMessage');
+                const icon = toast.querySelector('i');
+                msg.textContent = message;
+                toast.className = 'toast ' + type;
+                const icons = { info: 'fa-info-circle', success: 'fa-check-circle', error: 'fa-exclamation-circle' };
+                icon.className = 'fas ' + (icons[type] || icons.info);
+                toast.classList.add('show');
+                clearTimeout(this._toastTimer);
+                this._toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+            },
+
+            buildCreditDropdown(index, selectedValue) {
+                const options = this.creditOptions.map(function(opt) {
+                    const isSelected = opt === selectedValue;
+                    return '<div class="select-option ' + (isSelected ? 'selected' : '') + '" data-value="' + opt + '" onclick="App.selectCredit(' + index + ', ' + opt + ')">' +
+                        opt + ' Credit' + (opt !== 1 ? 's' : '') +
+                        '<i class="fas fa-check check"></i>' +
+                    '</div>';
+                }).join('');
+
+                const displayText = selectedValue 
+                    ? selectedValue + ' Credit' + (selectedValue !== 1 ? 's' : '') 
+                    : '<span class="placeholder">Select credits</span>';
+
+                return '<div class="custom-select" id="creditSelect-' + index + '">' +
+                    '<div class="select-trigger" onclick="App.toggleDropdown(' + index + ', event)">' +
+                        '<span>' + displayText + '</span>' +
+                        '<i class="fas fa-chevron-down"></i>' +
+                    '</div>' +
+                    '<div class="select-dropdown" id="dropdown-' + index + '">' + options + '</div>' +
+                '</div>';
+            },
+
+            toggleDropdown(index, event) {
+                event.stopPropagation();
+                const dropdown = document.getElementById('dropdown-' + index);
+                const trigger = dropdown.previousElementSibling;
+                const isOpen = dropdown.classList.contains('open');
+                document.querySelectorAll('.select-dropdown.open').forEach(function(d) {
+                    if (d !== dropdown) {
+                        d.classList.remove('open');
+                        d.previousElementSibling?.classList.remove('active');
+                    }
+                });
+                dropdown.classList.toggle('open');
+                trigger.classList.toggle('active');
+            },
+
+            selectCredit(index, value) {
+                this.subjects[index].credit = value;
+                const container = document.getElementById('creditSelect-' + index);
+                if (container) {
+                    container.outerHTML = this.buildCreditDropdown(index, value);
+                }
+                this.updateSubjectGPA(index);
+            },
+
+            generateSubjects() {
+                const count = parseInt(document.getElementById('subjectCount').value);
+                if (!count || count < 1 || count > 20) {
+                    this.showToast('Please enter a valid number (1-20)', 'error');
+                    return;
+                }
+                this.subjects = [];
+                for (let i = 0; i < count; i++) {
+                    this.subjects.push({ id: i + 1, marks: '', credit: null });
+                }
+                this.renderSubjects();
+                document.getElementById('subjectsCard').style.display = 'block';
+                document.getElementById('resultWrapper').classList.remove('visible');
+                this.showToast(count + ' subjects generated!', 'success');
+                setTimeout(function() {
+                    document.getElementById('subjectsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            },
+
+            addSubject() {
+                this.subjects.push({
+                    id: this.subjects.length + 1,
+                    marks: '',
+                    credit: null
+                });
+                this.renderSubjects();
+                this.showToast('Subject added!', 'success');
+            },
+
+            removeSubject(index) {
+                const cards = document.querySelectorAll('.subject-card');
+                if (cards[index]) {
+                    cards[index].classList.add('removing');
+                    setTimeout(() => {
+                        this.subjects.splice(index, 1);
+                        this.subjects.forEach(function(s, i) { s.id = i + 1; });
+                        this.renderSubjects();
+                    }, 300);
+                }
+            },
+
+            updateMarks(index, value) {
+                this.subjects[index].marks = value;
+                this.updateSubjectGPA(index);
+            },
+
+            updateSubjectGPA(index) {
+                const subject = this.subjects[index];
+                const gpaEl = document.getElementById('subjectGPA-' + index);
+                if (gpaEl && subject.marks !== '') {
+                    const marks = parseFloat(subject.marks);
+                    if (!isNaN(marks) && marks >= 0 && marks <= 100) {
+                        const gpa = this.getGPA(marks);
+                        gpaEl.textContent = gpa.toFixed(1);
+                        gpaEl.style.color = this.getGradeStyle(gpa).color;
+                    } else {
+                        gpaEl.textContent = '-';
+                        gpaEl.style.color = '';
+                    }
+                }
+            },
+
+            renderSubjects() {
+                const list = document.getElementById('subjectList');
+                if (this.subjects.length === 0) {
+                    list.innerHTML = '<div class="empty-state"><i class="fas fa-book-open"></i><p>No subjects yet. Use Quick Setup above!</p></div>';
+                    return;
+                }
+                const self = this;
+                list.innerHTML = this.subjects.map(function(subject, index) {
+                    const gpa = subject.marks !== '' ? self.getGPA(parseFloat(subject.marks)) : null;
+                    const gpaText = gpa !== null && !isNaN(gpa) ? gpa.toFixed(1) : '-';
+                    const gpaColor = gpa !== null ? self.getGradeStyle(gpa).color : '';
+
+                    return '<div class="subject-card">' +
+                        '<div class="subject-header">' +
+                            '<div class="subject-badge">' +
+                                '<div class="subject-num">' + (index + 1) + '</div>' +
+                                '<span class="subject-name">Subject ' + (index + 1) + '</span>' +
+                            '</div>' +
+                            '<button class="btn btn-ghost" onclick="App.removeSubject(' + index + ')" title="Remove">' +
+                                '<i class="fas fa-trash-alt"></i>' +
+                            '</button>' +
+                        '</div>' +
+                        '<div class="subject-inputs">' +
+                            '<div class="input-field">' +
+                                '<label>Marks (0-100)</label>' +
+                                '<div class="input-wrap">' +
+                                    '<i class="fas fa-percentage"></i>' +
+                                    '<input type="number" min="0" max="100" placeholder="Enter marks" value="' + subject.marks + '"' +
+                                        ' oninput="App.updateMarks(' + index + ', this.value)">' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="input-field">' +
+                                '<label>Credit Hours</label>' +
+                                self.buildCreditDropdown(index, subject.credit) +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="subject-gpa-chip">' +
+                            '<span>Subject GPA</span>' +
+                            '<strong id="subjectGPA-' + index + '" style="color: ' + gpaColor + '">' + gpaText + '</strong>' +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+            },
+
+            calculateGPA() {
+                let totalPoints = 0;
+                let totalCredits = 0;
+                let validSubjects = 0;
+                let errors = [];
+
+                this.subjects.forEach(function(subject, i) {
+                    const marks = parseFloat(subject.marks);
+                    const credit = subject.credit;
+
+                    if (subject.marks === '' || subject.marks === null) {
+                        errors.push('Subject ' + (i + 1) + ': marks missing');
+                        return;
+                    }
+                    if (credit === null) {
+                        errors.push('Subject ' + (i + 1) + ': credits not selected');
+                        return;
+                    }
+                    if (isNaN(marks) || marks < 0 || marks > 100) {
+                        errors.push('Subject ' + (i + 1) + ': invalid marks');
+                        return;
+                    }
+
+                    const gpa = App.getGPA(marks);
+                    totalPoints += gpa * credit;
+                    totalCredits += credit;
+                    validSubjects++;
+                });
+
+                if (validSubjects === 0) {
+                    this.showToast(errors[0] || 'Please fill in all subjects correctly', 'error');
+                    return;
+                }
+
+                const finalGPA = totalCredits > 0 ? totalPoints / totalCredits : 0;
+                const grade = this.getGradeLetter(finalGPA);
+                const style = this.getGradeStyle(finalGPA);
+
+                const gpaEl = document.getElementById('finalGPA');
+                gpaEl.textContent = finalGPA.toFixed(2);
+                gpaEl.setAttribute('data-gpa', finalGPA.toFixed(2));
+
+                const gradeEl = document.getElementById('resultGrade');
+                gradeEl.textContent = grade;
+                gradeEl.className = 'result-grade grade-tag ' + style.cls;
+                gradeEl.style.borderColor = style.color;
+                gradeEl.style.color = style.color;
+
+                document.getElementById('totalCredits').textContent = totalCredits.toFixed(1);
+                document.getElementById('totalPoints').textContent = totalPoints.toFixed(2);
+                document.getElementById('subjectCountDisplay').textContent = validSubjects;
+                document.getElementById('resultMessage').textContent = this.getPerformanceMessage(finalGPA);
+
+                const wrapper = document.getElementById('resultWrapper');
+                wrapper.classList.add('visible');
+
+                setTimeout(function() {
+                    wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+
+                this.showToast('GPA calculated successfully!', 'success');
+            },
+
+            resetAll() {
+                this.subjects = [];
+                document.getElementById('subjectCount').value = '';
+                document.getElementById('subjectsCard').style.display = 'none';
+                document.getElementById('resultWrapper').classList.remove('visible');
+                this.showToast('All cleared! Start fresh', 'info');
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() { App.init(); });
+    </script>
+</body>
+</html>
